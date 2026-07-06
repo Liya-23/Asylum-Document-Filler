@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asylum Document Filler</title>
+    <style>
+      :root {
+        --bg: #101820;
+        --panel: #17222c;
+        --panel-2: #1e2c38;
+        --line: #2d4050;
+        --text: #edf4f7;
+        --muted: #9eb0bb;
+        --accent: #31c6a8;
+        --accent-2: #f0b84f;
+        --danger: #e26464;
+        --radius: 8px;
+        --font: "Segoe UI", system-ui, sans-serif;
+        --mono: "Cascadia Code", Consolas, monospace;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 14px;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+        min-height: 100vh;
+      }
+
+      .topbar {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        min-height: 60px;
+        padding: 10px 22px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 250px;
+        font-weight: 700;
+      }
+
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        background: var(--accent);
+        color: var(--bg);
+      }
+
+      .tabs {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .tab {
+        color: var(--muted);
+        text-decoration: none;
+        padding: 8px 11px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        font-weight: 600;
+      }
+
+      .tab:hover { color: var(--text); background: var(--panel-2); }
+      .tab.active { color: var(--bg); background: var(--accent); }
+
+      .template-state {
+        margin-left: auto;
+        color: {% if template_ok %}var(--accent){% else %}var(--danger){% end %};
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .sidebar {
+        padding: 24px 20px;
+        background: var(--panel);
+        border-right: 1px solid var(--line);
+      }
+
+      .panel {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .panel-title {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+      }
+
+      .panel-body { padding: 16px; }
+
+      .field { margin-bottom: 14px; }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .4px;
+        text-transform: uppercase;
+      }
+
+      input,
+      select {
+        width: 100%;
+        min-height: 37px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--bg);
+        color: var(--text);
+        font: inherit;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      input[readonly] { color: var(--muted); }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 38px;
+        padding: 8px 12px;
+        border: 0;
+        border-radius: 6px;
+        background: var(--accent);
+        color: var(--bg);
+        cursor: pointer;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .button.secondary {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--line);
+      }
+
+      .button.danger {
+        background: transparent;
+        color: var(--danger);
+        border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+      }
+
+      .button:disabled {
+        opacity: .48;
+        cursor: not-allowed;
+      }
+
+      .btn-dl, .btn-del {
+        padding: 6px 12px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        transition: opacity .15s;
+      }
+      .btn-dl  { background: var(--accent); color: var(--bg); }
+      .btn-del { background: #e0525220; color: var(--danger); border: 1px solid #e2646433; }
+      .btn-dl:hover, .btn-del:hover { opacity: .8; }
+
+      .generate { width: 100%; margin-top: 4px; }
+
+      .status-note {
+        margin-top: 14px;
+        padding: 10px;
+        border-radius: 6px;
+        color: var(--muted);
+        background: var(--bg);
+        border: 1px solid var(--line);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .main {
+        padding: 24px 30px;
+        min-width: 0;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.25;
+      }
+
+      .count {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      #file-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .file-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--panel-2);
+      }
+
+      .file-name {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+
+      .file-meta {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .file-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .empty {
+        padding: 48px 20px;
+        border: 1px dashed var(--line);
+        border-radius: var(--radius);
+        color: var(--muted);
+        text-align: center;
+      }
+
+      #toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        display: none;
+        max-width: min(380px, calc(100vw - 48px));
+        padding: 12px 15px;
+        border-radius: 7px;
+        background: var(--accent);
+        color: var(--bg);
+        font-weight: 800;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, .35);
+      }
+
+      #toast.error {
+        background: var(--danger);
+        color: white;
+      }
+
+      @media (max-width: 820px) {
+        .shell { display: block; }
+        .topbar { align-items: flex-start; flex-direction: column; }
+        .template-state { margin-left: 0; }
+        .sidebar { border-right: 0; border-bottom: 1px solid var(--line); }
+        .main { padding: 20px; }
+        .file-card { grid-template-columns: 1fr; }
+        .file-actions { justify-content: flex-start; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">D</span>
+          <span>Asylum Document Filler</span>
+        </div>
+        <nav class="tabs" aria-label="Document type">
+          {% for key, kind in kinds.items() %}
+          <a
+            class="tab {% if key == current_kind.key %}active{% end %}"
+            href="/document/{{ key }}"
+            >{{ kind.label }}</a
+          >
+          {% end %}
+        </nav>
+        <div class="template-state">
+          {% if template_ok %}Template loaded{% else %}Template missing: {{
+          current_kind.template_name }}{% end %}
+        </div>
+      </header>
+
+      <aside class="sidebar">
+        <form class="panel" id="document-form">
+          <div class="panel-title">{{ current_kind.label }}</div>
+
+          <div class="panel-body">
+            <div class="field">
+              <label for="today">Today's Date</label>
+              <input id="today" type="text" readonly />
+            </div>
+
+            <div id="dynamic-fields"></div>
+
+            <button class="button generate" id="generate" type="submit" {% if not template_ok %} disabled {% end %}>
+            <span id="generate-label">Generate Document</span>
+            </button>
+
+            <div class="status-note">
+              Generated DOCX files appear on the right. PDFs appear too when
+              LibreOffice is available.
+            </div>
+          </div>
+        </form>
+      </aside>
+
+      <main class="main">
+        <div class="section-head">
+          <h1>Generated Documents</h1>
+          <span class="count" id="file-count">Loading</span>
+        </div>
+        <div id="file-list"></div>
+      </main>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      let currentKind = "{{ current_kind.key }}"
+        .toLowerCase()
+        .replace(/-/g, "_")
+        .replace(/ /g, "_");
+
+      /* -----------------------------
+         DATE
+      ------------------------------*/
+
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      const today = new Date();
+      document.getElementById("today").value =
+        String(today.getDate()).padStart(2, "0") +
+        " " +
+        months[today.getMonth()] +
+        " " +
+        today.getFullYear();
+
+      /* -----------------------------
+         SCHEMAS
+      ------------------------------*/
+
+      const SCHEMAS = {
+        newcomer: [
+          { type: "title", id: "title", label: "Title" },
+          { type: "name_split", label: "Full Names" },
+          {
+            type: "text",
+            id: "dob",
+            label: "Date of Birth",
+            placeholder: "DD/MM/YYYY",
+          },
+        ],
+
+        renewal: [
+          { type: "name_split", label: "Applicant Name" },
+          { type: "text", id: "tracking_number", label: "Tracking Number" },
+          { type: "text", id: "nationality", label: "Nationality" },
+        ],
+
+        confirmation: [
+          { type: "text", id: "application_type", label: "Application Type" },
+          { type: "name_split", label: "Applicant Name" },
+          {
+            type: "text",
+            id: "dob",
+            label: "Date of Birth",
+            placeholder: "DD/MM/YYYY",
+          },
+          { type: "text", id: "passport_number", label: "Passport Number" },
+          { type: "gender_select", id: "gender", label: "Gender" },
+        ],
+      };
+
+      /* -----------------------------
+         DERIVED LOGIC
+      ------------------------------*/
+
+      function derivePronoun(title) {
+        if (title === "Mr") return "his";
+        if (title === "Ms") return "her";
+        if (title === "Mrs") return "her";
+        return "their";
+      }
+
+      function deriveGender(title) {
+        if (title === "Mr") return "male";
+        if (title === "Ms" || title === "Mrs") return "female";
+        return "";
+      }
+
+      /* -----------------------------
+         SAFE FIELD CREATION
+      ------------------------------*/
+
+      function el(html) {
+        const template = document.createElement("template");
+        template.innerHTML = html.trim();
+        return template.content;
+      }
+
+      /* -----------------------------
+         RENDER FORM
+      ------------------------------*/
+      function renderForm() {
+        const container = document.getElementById("dynamic-fields");
+        const schema = SCHEMAS[currentKind];
+
+        container.innerHTML = "";
+
+        if (!schema) {
+          container.innerHTML = `
+            <div class="field">
+              <p style="color:red;">No schema found for: ${currentKind}</p>
+            </div>
+          `;
+          return;
+        }
+
+        schema.forEach((field) => {
+          if (field.type === "title") {
+            container.appendChild(
+              el(`
+                <div class="field">
+                  <label>${field.label}</label>
+                  <select id="title">
+                    <option value="">Select</option>
+                    <option>Mr</option>
+                    <option>Ms</option>
+                    <option>Mrs</option>
+                    <option>Dr</option>
+                    <option>Rev</option>
+                  </select>
+                </div>
+              `),
+            );
+          }
+
+          if (field.type === "name_split") {
+            container.appendChild(
+              el(`
+                <div class="field">
+                  <label>${field.label} - First Name</label>
+                  <input id="first_name" type="text" required>
+                </div>
+
+                <div class="field">
+                  <label>Middle Name</label>
+                  <input id="middle_name" type="text">
+                </div>
+
+                <div class="field">
+                  <label>Last Name</label>
+                  <input id="last_name" type="text" required>
+                </div>
+              `),
+            );
+          }
+
+          if (field.type === "text") {
+            container.appendChild(
+              el(`
+                <div class="field">
+                  <label>${field.label}</label>
+                  <input id="${field.id}" type="text" placeholder="${field.placeholder || ""}">
+                </div>
+              `),
+            );
+          }
+
+          if (field.type === "gender_select") {
+            container.appendChild(
+              el(`
+                <div class="field">
+                  <label>${field.label}</label>
+                  <select id="gender">
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+              `),
+            );
+          }
+        });
+      }
+
+      /* -----------------------------
+         TOAST
+      ------------------------------*/
+
+      let toastTimer;
+      function toast(msg, err = false) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.className = err ? "error" : "";
+        el.style.display = "block";
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => (el.style.display = "none"), 3000);
+      }
+
+      /* -----------------------------
+         LOAD FILES
+      ------------------------------*/
+
+      async function loadFiles() {
+        let files = [];
+
+        try {
+          const res = await fetch(`/files/${currentKind}`);
+          if (!res.ok) throw new Error();
+          files = await res.json();
+        } catch {
+          toast("Unable to load files.", true);
+          return;
+        }
+
+        const list = document.getElementById("file-list");
+        const count = document.getElementById("file-count");
+
+        count.textContent = files.length + " files";
+
+        if (!files.length) {
+          list.innerHTML = `<div class="empty">No generated documents yet.</div>`;
+          return;
+        }
+
+        list.innerHTML = files
+          .map(
+            (f) => `
+              <div class="file-card">
+                <div>
+                  <div class="file-name">${f.name}</div>
+                  <div class="file-meta">${f.created} · ${f.size_kb} KB</div>
+                </div>
+                <div class="file-actions">
+                  <a class="button" href="/download/${encodeURIComponent(f.name)}">DOCX</a>
+                  ${f.pdf ? `<a class="button secondary" href="/download/${encodeURIComponent(f.pdf)}">PDF</a>` : ""}
+                  <button class="btn-del" onclick="deleteFile('${f.name}')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            `,
+          )
+          .join("");
+      }
+
+      /* -----------------------------
+         SUBMIT
+      ------------------------------*/
+
+      document
+        .getElementById("document-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const dob = document.getElementById("dob")?.value.trim();
+          if (dob && !/^\d{2}\/\d{2}\/\d{4}$/.test(dob)) {
+            toast("Date of Birth must be DD/MM/YYYY", true);
+            return;
+          }
+
+          const title = document.getElementById("title")?.value || "";
+          const first =
+            document.getElementById("first_name")?.value.trim() || "";
+          const middle =
+            document.getElementById("middle_name")?.value.trim() || "";
+          const last = document.getElementById("last_name")?.value.trim() || "";
+
+          if (!first) {
+            toast("First Name is required.", true);
+            return;
+          }
+
+          if (!last) {
+            toast("Last Name is required.", true);
+            return;
+          }
+
+          const fullName = [first, middle, last].filter(Boolean).join(" ");
+
+          const form = new FormData();
+
+          document
+            .querySelectorAll("#dynamic-fields input, #dynamic-fields select")
+            .forEach((elm) => {
+              if (elm.id) {
+                form.set(elm.id, elm.value.trim());
+              }
+            });
+
+          form.set("full_names", fullName);
+          form.set("last_name", last);
+          form.set("pronoun", derivePronoun(title));
+
+          const gender = document.getElementById("gender")?.value;
+          if (gender) {
+            form.set("gender", gender);
+          } else if (title) {
+            const derived = deriveGender(title);
+            if (derived) form.set("gender", derived);
+          }
+
+          const btn = document.getElementById("generate");
+          const label = document.getElementById("generate-label");
+
+          btn.disabled = true;
+          label.textContent = "Generating...";
+
+          try {
+            const res = await fetch(`/generate/${currentKind}`, {
+              method: "POST",
+              body: form,
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.ok) {
+              toast(data.error || "Generation failed", true);
+              return;
+            }
+
+            toast("Generated " + data.filename);
+            await loadFiles();
+          } catch (err) {
+            toast("Server error", true);
+          } finally {
+            btn.disabled = false;
+            label.textContent = "Generate Document";
+          }
+        });
+
+      /* -----------------------------
+         DELETE
+      ------------------------------*/
+
+      async function deleteFile(name) {
+        if (!confirm(`Delete "${name}"?`)) return;
+        const res = await fetch(`/delete/${encodeURIComponent(name)}`, {
+          method: "POST",
+        });
+        const data = await res.json();
+        if (data.ok) {
+          toast("File deleted.");
+          loadFiles();
+        } else {
+          toast(data.error || "Delete failed.", true);
+        }
+      }
+
+      /* -----------------------------
+         PRINT
+      ------------------------------*/
+
+      function printFile(fileName) {
+        const pdfName = fileName.replace(".docx", ".pdf");
+        const win = window.open(
+          `/pdf/${encodeURIComponent(pdfName)}`,
+          "_blank",
+        );
+        if (win) {
+          win.onload = () => win.print();
+        }
+      }
+
+      /* -----------------------------
+         INIT
+      ------------------------------*/
+
+      renderForm();
+      loadFiles();
+    </script>
+  </body>
+</html>
