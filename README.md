@@ -24,6 +24,8 @@ Each template can use these placeholders:
 - `[DOB]`
 - `[pronoun]`
 - `[gender]`
+- `[identity block]`
+- `[identity Sentence]`
 
 ## Run
 

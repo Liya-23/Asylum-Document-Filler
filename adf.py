@@ -23,7 +23,7 @@ from docx import Document
 
 
 BASE_DIR = Path(__file__).resolve().parent
-OUTPUT_DIR = BASE_DIR / "output"
+OUTPUT_DIR = Path(r"\\IT-PC2\Scan_Clients\ASYLUM Letters")
 TEMPLATE_DIR = BASE_DIR
 WEB_TEMPLATE_DIR = BASE_DIR / "templates"
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -45,7 +45,7 @@ class DocumentKind:
 
 
 DOCUMENT_KINDS = {
-    "newcomer": DocumentKind("newcomer", "Asylum Newcomer", "ASYLUM_NEW_COMER_Template.docx"),
+    "newcomer": DocumentKind("newcomer", "Asylum Newcomer", "ASYLUM_NEW_COMER_Template_NEW.docx"),
     "renewal": DocumentKind("renewal", "Asylum Renewal", "ASYLUM_RENEWAL_Template.docx"),
     "confirmation": DocumentKind("confirmation", "Confirmation Letter", "CONFIRMATION_LETTER_Template.docx"),
 }
@@ -202,6 +202,8 @@ def generate_document(
     passport_number: str = "",
     selected_gender: str = "",
     last_name: str = "",
+    identinty_block: str = "",
+    identinty_sentence: str = "",
 ) -> tuple[Path, Path | None]:
     words = TITLE_WORDS.get(title, DEFAULT_WORDS)
     if selected_gender == "male":
