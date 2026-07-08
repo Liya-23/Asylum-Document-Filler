@@ -455,7 +455,7 @@ def main() -> None:
 
     app = make_app()
     app.listen(args.port)
-
+    # prints
     print("\nAsylum Document Filler")
     print(f"URL       -> http://localhost:{args.port}")
     print(f"Templates -> {TEMPLATE_DIR}")
