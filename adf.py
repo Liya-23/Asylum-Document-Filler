@@ -219,7 +219,7 @@ def generate_document(
     else:
         identity_block = f"Date of birth: {dob}"
         identity_sentence = f"{full_names}, Date of birth: {dob}"
-
+# date shoulde be fixed now 11 aug
     today = datetime.today().strftime("%d %B %Y")
     replacements = {
         "[Todays Date]": today,
