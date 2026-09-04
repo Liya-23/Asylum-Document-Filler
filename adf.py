@@ -45,7 +45,7 @@ class DocumentKind:
 
 
 DOCUMENT_KINDS = {
-    "newcomer": DocumentKind("newcomer", "Asylum Newcomer", "ASYLUM_NEW_COMER_Template_NEW.docx"),
+    "newcomer": DocumentKind("newcomer", "Asylum Newcomer", "ASYLUM_NEW_COMER_Template - adjusted for Concourt judgement 03 september.docx"),
     "renewal": DocumentKind("renewal", "Asylum Renewal", "ASYLUM_RENEWAL_Template.docx"),
     "confirmation": DocumentKind("confirmation", "Confirmation Letter", "templates/CONFIRMATION_LETTER_Template.docx"),
 }
