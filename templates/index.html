@@ -620,7 +620,7 @@
                 </div>
                 <div class="file-actions">
                   <a class="button" href="/download/${encodeURIComponent(f.name)}">DOCX</a>
-                  ${f.pdf ? `<a class="button secondary" href="/download/${encodeURIComponent(f.pdf)}">PDF</a>` : ""}
+                  ${f.pdf ? `<a class="button secondary" href="/pdf/${encodeURIComponent(f.pdf)}" target="_blank" rel="noopener">PDF</a>` : ""}
                   <button class="btn-del" onclick="deleteFile('${f.name}')">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                     Delete
