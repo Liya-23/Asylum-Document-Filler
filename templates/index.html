@@ -215,13 +215,23 @@
 
       #updates {
         margin-top: 14px;
-        padding: 10px;
+        padding: 10px 12px;
         border-radius: 6px;
-        color: #e2646433;
+        color: #0b1410;
         background: var(--accent);
         border: 1px solid var(--line);
         font-size: 12px;
-        line-height: 1.45;
+        font-weight: 700;
+        line-height: 1.5;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      #updates::before {
+        content: "✦";
+        flex-shrink: 0;
+        font-size: 13px;
       }
 
       .main {
@@ -349,9 +359,11 @@
 
       <aside class="sidebar">
         <div class="status-note" id="updates">
-              Asylum Newcomer letter Updated...
-            </div>
-
+          <span>
+            <strong>What's new:</strong> Long Explanation letter added, and Date of Birth now auto-inserts slashes while typing.
+          </span>
+        </div>
+        <br><br>
         <form class="panel" id="document-form">
           <div class="panel-title">{{ current_kind.label }}</div>
 
