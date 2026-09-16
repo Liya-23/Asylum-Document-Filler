@@ -457,7 +457,7 @@
         ],
 
         explainer: [
-          {type: "text", id: "application_type", label: "Application Type" },
+          { type: "title", id: "title", label: "Title" },
           { type: "name_split", label: "Applicant Name" },
           {
             type: "text",
@@ -467,9 +467,20 @@
           },
           { type: "text", id: "passport_number", label: "Passport Number" },
           { type: "text", id: "nationality", label: "Nationality" },
-          { type: "gender_select", id: "gender", label: "Gender" },
 
+        ],
+
+        long: [
+          { type: "title", id: "title", label: "Title" },
+          { type: "name_split", label: "Applicant Name" },
+          {
+            type: "text",
+            id: "dob",
+            label: "Date of Birth",
+            placeholder: "DD/MM/YYYY",
+          },
         ]
+
       };
 
       /* -----------------------------
@@ -582,6 +593,26 @@
               `),
             );
           }
+
+          if (field.id === "dob") {
+            const dobInput = document.getElementById("dob");
+            dobInput.setAttribute("maxlength", "10");
+            dobInput.setAttribute("inputmode", "numeric");
+
+            dobInput.addEventListener("input", (e) => {
+              let digits = e.target.value.replace(/\D/g, "").slice(0, 8);
+              let formatted = digits;
+            
+              if (digits.length > 4) {
+                formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+              } else if (digits.length > 2) {
+                formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+              }
+            
+              e.target.value = formatted;
+            });
+          }
+
         });
       }
 

@@ -48,7 +48,8 @@ DOCUMENT_KINDS = {
     "newcomer": DocumentKind("newcomer", "Asylum Newcomer", "ASYLUM_NEW_COMER.docx"),
     "renewal": DocumentKind("renewal", "Asylum Renewal", "ASYLUM_RENEWAL.docx"),
     "confirmation": DocumentKind("confirmation", "Confirmation Letter", "CONFIRMATION_LETTER.docx"),
-    "explainer": DocumentKind("explainer", "Explainer", "Explainer_CONFIRMATION_LETTER.docx")
+    "explainer": DocumentKind("explainer", "Explainer", "Explainer_SHORT_LETTER.docx"),
+    "long": DocumentKind("long", "Explainer Long", "Explainer_LONG_LETTER.docx") 
 }
 
 
