@@ -19,7 +19,36 @@
         --font: "Segoe UI", system-ui, sans-serif;
         --mono: "Cascadia Code", Consolas, monospace;
       }
+      body[data-kind="newcomer"] {
+        --accent: #31c6a8;
+        --accent-light: #65e0c7;
+        --accent-glow: rgba(49, 198, 168, 0.22);
+      }
 
+      body[data-kind="renewal"] {
+        --accent: #f0b84f;
+        --accent-light: #ffd477;
+        --accent-glow: rgba(240, 184, 79, 0.22);
+      }
+
+      body[data-kind="confirmation"] {
+        --accent: #6ea8fe;
+        --accent-light: #9cc2ff;
+        --accent-glow: rgba(110, 168, 254, 0.22);
+      }
+
+      body[data-kind="explainer"] {
+        --accent: #c084fc;
+        --accent-light: #d8aaff;
+        --accent-glow: rgba(192, 132, 252, 0.22);
+      }
+
+      body[data-kind="long"] {
+        --accent: #f06f6f;
+        --accent-light: #ff9999;
+        --accent-glow: rgba(240, 111, 111, 0.22);
+      }
+      
       * { box-sizing: border-box; }
 
       body {
@@ -84,7 +113,7 @@
       }
 
       .tab:hover { color: var(--text); background: var(--panel-2); }
-      .tab.active { color: var(--bg); background: var(--accent); }
+      .tab.active { color: var(--bg); background: var(--accent); box-shadow: 0 0 14px var(--accent-glow);}
 
       .template-state {
         margin-left: auto;
@@ -227,7 +256,7 @@
         align-items: flex-start;
         gap: 8px;
       }
-      
+
       #updates::before {
         content: "✦";
         flex-shrink: 0;
@@ -335,7 +364,7 @@
       }
     </style>
   </head>
-  <body>
+  <body data-kind="{{ current_kind.key }}">
     <div class="shell">
       <header class="topbar">
         <div class="brand">
